@@ -6,3 +6,8 @@ Edit: done! Try:
 optimiser = GPOptimiser(rosenbrock_function,2)
 optimiser.optimise(verbose=True)
 ```
+
+## Todo
+- Compare to someone else's implementation to check for any bugs
+- Compare to gradient descent
+- Pretty graphs of learning curve, maybe
