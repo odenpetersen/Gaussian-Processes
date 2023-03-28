@@ -15,11 +15,11 @@ def rbf_kernel(x, y):
         raise ValueError(f"Incompatible lengths {len(x)} and {len(y)}.")
     return jnp.exp(-jnp.sum(jnp.square(x-y))/2/len(x)**2)
 
-def upper_confidence_bound(mu, sigma, k=1):
-    return mu+k*sigma
+def lower_confidence_bound(mu, sigma, k=1):
+    return mu-k*sigma
 
 class GPOptimiser():
-    def __init__(self, loss_function, dim=None, kernel=rbf_kernel, acquisition_function=upper_confidence_bound, sampled_points=[], observed_values = []):
+    def __init__(self, loss_function, dim=None, kernel=rbf_kernel, acquisition_function=lower_confidence_bound, sampled_points=[], observed_values = []):
         if len(jnp.array(sampled_points)) == 0 and dim is None:
             raise ValueError("Could not deduce dimension of loss function domain. Please provide an argument for either sampled_points or dims.")
         elif dim is None:
@@ -58,7 +58,7 @@ class GPOptimiser():
             self.sampled_points = sampled_points
             self.observed_values = observed_values
 
-    def suggest_sample(self, acquisition_function = upper_confidence_bound, lr = 0.01, gradient_steps = 50):
+    def suggest_sample(self, lr = 0.01, gradient_steps = 50):
         @jax.jit
         def gp_objective(x):
             between_covs = jnp.array([self.kernel(x,point) for point in self.sampled_points]) 
