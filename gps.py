@@ -77,6 +77,7 @@ class GPOptimiser():
             step /= jnp.linalg.norm(step)
             x -= lr * step
 
+        #Really this should return the *best* x so far, I'm kind of just assuming for now that the final value of x yielded the highest value of acquisition function
         return x
 
     def optimise(self,n=100,verbose=False):
