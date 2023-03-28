@@ -11,3 +11,4 @@ optimiser.optimise(verbose=True)
 - Compare to someone else's implementation to check for any bugs
 - Compare to gradient descent
 - Pretty graphs of learning curve, maybe
+- Gradient-based smoothness priors using JAX

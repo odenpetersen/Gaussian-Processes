@@ -75,7 +75,7 @@ class GPOptimiser():
             if not all(jnp.isfinite(step)):
                 step = nprand.normal(size=self.dim)
             step /= jnp.linalg.norm(step)
-            x += lr * step
+            x -= lr * step
 
         return x
 
