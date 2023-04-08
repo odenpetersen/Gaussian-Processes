@@ -1,9 +1,21 @@
 from gaussian_process import GP
+import jax
+from jax import numpy as jnp
+from numpy import random as nprand
+
+jax.config.update("jax_enable_x64", True)
+
+def rosenbrock_function(x):
+    return (1-x[0])**2 + 100*(x[1]-x[0]**2)**2
 
 def lower_confidence_bound(mu, sigma, k=1):
     return mu-k*sigma
 
 class GPOptimiser(GP):
+    def __init__(self, loss_function, dim=None, kernel=None, acquisition_function=lower_confidence_bound, sampled_points=[], observed_values = []):
+        self.acquisition_function = acquisition_function
+        super().__init__(loss_function, dim, kernel, sampled_points, observed_values)
+
     def suggest_sample(self, lr = 0.01, gradient_steps = 50):
         @jax.jit
         def gp_objective(x):

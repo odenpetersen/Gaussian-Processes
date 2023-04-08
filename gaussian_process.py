@@ -5,9 +5,6 @@ from numpy import random as nprand
 
 jax.config.update("jax_enable_x64", True)
 
-def rosenbrock_function(x):
-    return (1-x[0])**2 + 100*(x[1]-x[0]**2)**2
-
 def rbf_kernel(x, y):
     x = jnp.array(x)
     y = jnp.array(y)
@@ -16,7 +13,9 @@ def rbf_kernel(x, y):
     return jnp.exp(-jnp.sum(jnp.square(x-y))/2/len(x)**2)
 
 class GP():
-    def __init__(self, loss_function, dim=None, kernel=rbf_kernel, acquisition_function=lower_confidence_bound, sampled_points=[], observed_values = []):
+    def __init__(self, loss_function, dim=None, kernel=None, sampled_points=[], observed_values = []):
+        if kernel is None:
+            kernel = rbf_kernel
         if len(jnp.array(sampled_points)) == 0 and dim is None:
             raise ValueError("Could not deduce dimension of loss function domain. Please provide an argument for either sampled_points or dims.")
         elif dim is None:
@@ -35,7 +34,6 @@ class GP():
         self.in_sample_covs = jnp.array([[self.kernel(p1,p2) for p2 in sampled_points] for p1 in sampled_points])
         self.kernel = kernel
         self.loss_function = loss_function
-        self.acquisition_function = acquisition_function
 
     def add_samples(self, sampled_points, observed_values):
         sampled_points = jnp.array(sampled_points).reshape((-1,self.dim))
