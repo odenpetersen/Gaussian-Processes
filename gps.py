@@ -66,19 +66,25 @@ class GPOptimiser():
             explore_sigma = jnp.sqrt(self.kernel(x,x) - between_covs @ jnp.linalg.solve(self.in_sample_covs, between_covs))
             return self.acquisition_function(exploit_mu, explore_sigma)
 
-        objective_grad = jax.grad(gp_objective)
+        objective_and_grad = jax.value_and_grad(gp_objective)
 
-        x = jnp.zeros(self.dim)
+        x = nprand.normal(size=self.dim)
+
+        best_x = x
+        best_val = gp_objective(x)
 
         for _ in range(gradient_steps):
-            step = objective_grad(x)
+            val,step = objective_and_grad(x)
+            if val < best_val:
+                best_x = x
+                best_val = val
             if not all(jnp.isfinite(step)):
                 step = nprand.normal(size=self.dim)
             step /= jnp.linalg.norm(step)
             x -= lr * step
 
-        #Really this should return the *best* x so far, I'm kind of just assuming for now that the final value of x yielded the highest value of acquisition function
-        return x
+        #return x
+        return best_x
 
     def optimise(self,n=100,verbose=False):
         for _ in range(n):
