@@ -20,8 +20,8 @@ class GPOptimiser(GP):
         @jax.jit
         def gp_objective(x):
             between_covs = jnp.array([self.kernel(x,point) for point in self.sampled_points]) 
-            exploit_mu = between_covs @ jnp.linalg.solve(self.in_sample_covs, self.observed_values)
-            explore_sigma = jnp.sqrt(self.kernel(x,x) - between_covs @ jnp.linalg.solve(self.in_sample_covs, between_covs))
+            exploit_mu = self.mean(x)
+            explore_sigma = self.var(x)
             return self.acquisition_function(exploit_mu, explore_sigma)
 
         objective_and_grad = jax.value_and_grad(gp_objective)

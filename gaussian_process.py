@@ -53,3 +53,13 @@ class GP():
             self.sampled_points = sampled_points
             self.observed_values = observed_values
 
+    def train_set_covs(self,x):
+        return jnp.array([self.kernel(x,point) for point in self.sampled_points]) 
+
+    def mean(self,x):
+        between_covs = self.train_set_covs(x)
+        return between_covs @ jnp.linalg.solve(self.in_sample_covs, self.observed_values)
+
+    def var(self,x):
+        between_covs = self.train_set_covs(x)
+        return jnp.sqrt(self.kernel(x,x) - between_covs @ jnp.linalg.solve(self.in_sample_covs, between_covs))
